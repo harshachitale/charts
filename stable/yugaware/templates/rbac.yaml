@@ -76,7 +76,6 @@ rules:
 - apiGroups: [""]
   resources:
   - namespaces
-  - secrets
   - pods/portforward
   - events          # added events resource
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]  # added all verbs for events
@@ -85,6 +84,19 @@ rules:
   - deployments
   - services
   verbs: ["create", "get", "list", "watch", "update", "delete"]
+  #added from platform-global.yaml
+- apiGroups: [""]
+  resources:
+  - persistentvolumeclaims
+  verbs: ["list", "delete"]    
+- apiGroups: [""]
+  resources:
+  - pods/exec
+  verbs: ["create"] 
+- apiGroups: ["apps"]
+  resources:
+  - statefulsets/scale
+  verbs: ["patch"] 
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
