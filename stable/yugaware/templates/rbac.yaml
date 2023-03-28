@@ -36,67 +36,149 @@ kind: ClusterRole
 metadata:
   name: {{ .Release.Name }}
 rules:
-- apiGroups: ["policy"]
+rules:
+- apiGroups:
+  - "policy"
   resources:
-  - poddisruptionbudgets
-  verbs: ["get", "create", "delete", "patch"]
-- apiGroups: [""]
+  - "poddisruptionbudgets"
+  verbs:
+  - "get"
+  - "create"
+  - "delete"
+  - "patch"
+- apiGroups:
+  - ""
   resources:
-  - services
-  verbs: ["get", "delete", "create", "patch", "list", "watch"]
-- apiGroups: ["apps"]
+  - "services"
+  verbs:
+  - "get"
+  - "delete"
+  - "create"
+  - "patch"
+- apiGroups:
+  - "apps"
   resources:
-  - statefulsets
-  verbs: ["get", "delete", "create", "patch", "scale"]
-- apiGroups: [""]
+  - "statefulsets"
+  verbs:
+  - "get"
+  - "delete"
+  - "create"
+  - "patch"
+- apiGroups:
+  - ""
   resources:
-  - secrets
-  verbs: ["create", "list", "get", "delete", "update", "patch"]
-- apiGroups: ["cert-manager.io"]
+  - "secrets"
+  verbs:
+  - "create"
+  - "list"                      # needed by Helm
+  - "get"
+  - "delete"
+  - "update"                    # needed by Helm
+  - "patch"
+- apiGroups:
+  - "cert-manager.io"
   resources:
-  - certificates
-  verbs: ["create", "delete", "get", "patch"]
-- apiGroups: [""]
+  - "certificates"
+  verbs:
+  - "create"
+  - "delete"
+  - "get"
+  - "patch"
+- apiGroups:
+  - ""
+  resources:
+  - "configmaps"
+  verbs:
+  - "get"
+  - "create"
+  - "patch"
+  - "delete"  
+# as comment for verbs not able to understand which permissions are for node,nodes/proxy and endpoints - by H
+- apiGroups: 
+  - "" 
   resources:
   - nodes
   - nodes/proxy
-  - services
   - endpoints
-  - pods
-  - pods/exec
-  - configmaps      # added configmaps resource
-  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]   # added all verbs for configmaps
-- apiGroups:
+  - configmaps      # added configmaps resource    #configmaps will be removed from here as already mentioned above - by H
+  verbs: 
+  - "get"
+  - "list"
+  - "watch"
+  - "create"
+  - "update"
+  - "patch"
+  - "delete"   # added all verbs for configmaps
+###
+- apiGroups:   #extra
   - extensions
   resources:
   - ingresses
-  verbs: ["get", "list", "watch"]
-- nonResourceURLs: ["/metrics"]
-  verbs: ["get"]
-- apiGroups: [""]
-  resources:
-  - namespaces
-  - pods/portforward
-  - events          # added events resource
-  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]  # added all verbs for events
-- apiGroups: ["", "extensions"]
+  verbs: 
+  - "get"
+  - "list"
+  - "watch"
+- nonResourceURLs: ["/metrics"]   #extra
+  verbs: ["get"]   
+- apiGroups: #extra
+  - ""
+  - "extensions"   
   resources:
   - deployments
-  - services
-  verbs: ["create", "get", "list", "watch", "update", "delete"]
-  #added from platform-global.yaml
-- apiGroups: [""]
+  verbs: 
+  - "create"
+  - "get"
+  - "list"
+  - "watch"
+  - "update"
+  - "delete" 
+- apiGroups:
+  - ""
   resources:
-  - persistentvolumeclaims
-  verbs: ["list", "delete"]    
-- apiGroups: [""]
+  - "namespaces"
+  verbs:
+  - "delete"
+  - "create"
+  - "patch"
+- apiGroups:
+  - ""
   resources:
-  - pods/exec
-  verbs: ["create"] 
-- apiGroups: ["apps"]
+  - "pods"
+  verbs:
+  - "get"                       # required for single pod
+  - "list"                      # required for get pods
+- apiGroups:
+  - ""
   resources:
-  - statefulsets/scale
-  verbs: ["patch"] 
+  - "services"
+  verbs:
+  - "get"
+  - "list"                      # required for label selectors
+- apiGroups:
+  - ""
+  resources:
+  - "persistentvolumeclaims"
+  verbs:
+  - "list"                      # required for label selectors
+  - "delete"
+- apiGroups:
+  - ""
+  resources:
+  - "pods/exec"
+  verbs:
+  - "create"                      # required for exec and cp
+- apiGroups:
+  - "apps"
+  resources:
+  - "statefulsets/scale"
+  verbs:
+  - "patch"                     # required for scale command
+- apiGroups:
+  - ""
+  resources:
+  - "events"
+  verbs:
+  - "list"
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
