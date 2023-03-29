@@ -35,7 +35,10 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: {{ .Release.Name }}
-rules:
+
+# yugabyte-helm-operations role has set of permissions required to
+# install, upgrade, delete the yugabyte chart.
+
 rules:
 - apiGroups:
   - "policy"
@@ -93,45 +96,27 @@ rules:
   - "create"
   - "patch"
   - "delete"  
-# as comment for verbs not able to understand which permissions are for node,nodes/proxy and endpoints - by H
+
+# yugabyte-management role has set of permissions required by
+# platform software to manage YugabyteDB universes.
+
 - apiGroups: 
   - "" 
   resources:
   - nodes
+  verbs: 
+  - "get"
+  - "list" 
+- apiGroups: 
+  - "" 
+  resources:
   - nodes/proxy
-  - endpoints
-  - configmaps      # added configmaps resource    #configmaps will be removed from here as already mentioned above - by H
   verbs: 
   - "get"
-  - "list"
-  - "watch"
-  - "create"
-  - "update"
-  - "patch"
-  - "delete"   # added all verbs for configmaps
-###
-- apiGroups:   #extra
-  - extensions
-  resources:
-  - ingresses
-  verbs: 
-  - "get"
-  - "list"
-  - "watch"
-- nonResourceURLs: ["/metrics"]   #extra
-  verbs: ["get"]   
-- apiGroups: #extra
-  - ""
-  - "extensions"   
-  resources:
-  - deployments
-  verbs: 
-  - "create"
-  - "get"
-  - "list"
-  - "watch"
-  - "update"
-  - "delete" 
+
+# - nonResourceURLs: ["/metrics"]   #extra
+#   verbs: ["get"]   
+
 - apiGroups:
   - ""
   resources:
